@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [
+                    ['$', '$'],
+                    ['\\(', '\\)']
+                ]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+    <title>Verhulst</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Interação interespecífica Predador x Presa</h1>
+        <p>
+            $$P_{n+1}=P_n+\lambda_pP_n\left(1-\frac{P_n}{K_p}\right)+\gamma_{q,p}Q_nP_n$$
+            $$Q_{n+1}=Q_n+\lambda_pQ_n\left(1-\frac{Q_n}{K_q}\right)-\gamma_{p,q}P_nQ_n$$
+        </p>
+
+
+        <h2>Predador P</h2>
+        <p>$P_0$: <input type="number" step="0.000000001" id="p_0" placeholder="P_0" value="78"></p>
+        <p>$\lambda_p$: <input type="number" step="0.000000001" id="lambda_p" placeholder="lambda_p" value="0.05"></p>
+        <p>$K_p$: <input type="number" step="0.000000001" id="K_p" placeholder="K_p" value="120"></p>
+        <p>$\gamma_{q,p}$: <input type="number" step="0.000000001" id="gamma_qp" placeholder="gamma_q,p" value="2e-5"></p>
+
+        <h2>Presa Q</h2>
+        <p>$Q_0$: <input type="number" step="0.000000001" id="q_0" placeholder="Q_0" value="150"></p>
+        <p>$\lambda_q$: <input type="number" step="0.000000001" id="lambda_q" placeholder="lambda_q" value="0.05"></p>
+        <p>$K_q$: <input type="number" step="0.000000001" id="K_q" placeholder="K_q" value="800"></p>
+        <p>$\gamma_{p,q}$: <input type="number" step="0.000000001" id="gamma_pq" placeholder="gamma_p,q" value="-2e-7"></p>
+
+
+        <p> Número de gerações:</p> <input type="number" id="n" placeholder="n" value="120">
+
+        <button id="grafico">Gráfico</button>
+        <canvas id="myChart" style="width:100%;max-width:700px;margin-top: 40px;"></canvas>
+    </div>
+    <script>
+
+        function interaction(a_n, lambda_a, k_a, b_n, gamma_ab) {
+            return a_n + lambda_a * a_n * (1 - (a_n / k_a)) + gamma_ab * b_n * a_n
+        }
+
+        document.getElementById('grafico').onclick = function () {
+            p_0 = parseFloat(document.getElementById('p_0').value)
+            lambda_p = parseFloat(document.getElementById('lambda_p').value)
+            k_p = parseFloat(document.getElementById('K_p').value)
+            gamma_qp = parseFloat(document.getElementById('gamma_qp').value)
+
+            q_0 = parseFloat(document.getElementById('q_0').value)
+            lambda_q = parseFloat(document.getElementById('lambda_q').value)
+            k_q = parseFloat(document.getElementById('K_q').value)
+            gamma_pq = parseFloat(document.getElementById('gamma_pq').value)
+
+            n = document.getElementById('n').value
+
+            P = [p_0]
+            Q = [q_0]
+            t = [0]
+
+
+
+            for (i = 0; i <= n; i++) {
+                P.push(interaction(P[i], lambda_p, k_p, Q[i], gamma_qp))
+                Q.push(interaction(Q[i], lambda_q, k_q, P[i], gamma_pq))
+                t.push(i + 1)
+            }
+
+
+            new Chart("myChart", {
+                type: "line",
+                data: {
+                    labels: t,
+                    datasets: [{
+                        data: P,
+                        borderColor: "red",
+                        fill: false,
+                        label: "Predador"
+                    }, {
+                        data: Q,
+                        borderColor: "green",
+                        fill: false,
+                        label: "Presa"
+                    }]
+                },
+                options: {
+                    legend: { display: true }
+                }
+            });
+
+        }
+    </script>
+    <style>
+        input {
+            width: 90px;
+            margin-left: 5px;
+            margin-right: 20px;
+        }
+
+        #grafico {
+            display: block;
+            margin-top: 20px;
+        }
+
+        .container {
+            max-width: 90%;
+            margin: auto;
+            border: solid 1px #e3e3e3;
+            padding: 20px;
+        }
+    </style>
+</body>
+
+</html>
